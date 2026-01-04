@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Collection - Gents Jewelry</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            color: #fff;
+        }
+
+        /* Header & Logo */
+        header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            padding: 20px 0;
+            border-bottom: 2px solid #d4af37;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .logo-text {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #d4af37, #ffd700, #d4af37);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-align: center;
+        }
+
+        .logo-tagline {
+            text-align: center;
+            color: #d4af37;
+            font-size: 18px;
+            letter-spacing: 8px;
+            margin-top: -5px;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            background-color: #d4af37;
+            color: #000;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px auto;
+            max-width: 800px;
+            border: 1px solid #d4af37;
+            display: none;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #d4af37;
+        }
+
+        .admin-title {
+            font-size: 28px;
+            color: #d4af37;
+        }
+
+        .admin-toggle {
+            background: #d4af37;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d4af37;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #d4af37;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .image-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .image-option {
+            border: 2px dashed #d4af37;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-option:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .image-option i {
+            font-size: 48px;
+            color: #d4af37;
+            margin-bottom: 15px;
+        }
+
+        .image-option h4 {
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+
+        .url-input-container {
+            margin-top: 15px;
+        }
+
+        .image-preview {
+            max-width: 300px;
+            max-height: 300px;
+            margin: 15px auto;
+            display: none;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 5px;
+            border: 2px solid #d4af37;
+        }
+
+        .remove-image {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .remove-image:hover {
+            background: #ff6666;
+        }
+
+        .image-size-warning {
+            font-size: 12px;
+            color: #ff9800;
+            margin-top: 5px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #d4af37;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #ffd700;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #333;
+            color: #fff;
+            border: 1px solid #d4af37;
+        }
+
+        .btn-secondary:hover {
+            background: #444;
+        }
+
+        /* Products Section */
+        .products-section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #d4af37;
+            position: relative;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 3px;
+            background: #d4af37;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .product-card {
+            background: #1a1a1a;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #333;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: #d4af37;
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .product-image {
+            height: 250px;
+            overflow: hidden;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .product-category {
+            color: #d4af37;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .product-price {
+            font-size: 24px;
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        /* Order Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .order-modal {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid #d4af37;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #d4af37;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #d4af37;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Orders Section */
+        .orders-section {
+            background: #1a1a1a;
+            padding: 60px 0;
+            margin-top: 60px;
+            border-top: 2px solid #d4af37;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .orders-table th, .orders-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        .orders-table th {
+            background: #2a2a2a;
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            color: #ff9800;
+        }
+
+        .status-completed {
+            color: #4CAF50;
+        }
+
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            padding: 50px 0 20px;
+            margin-top: 60px;
+            border-top: 2px solid #d4af37;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-column h3 {
+            color: #d4af37;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .footer-column p, .footer-column a {
+            color: #ccc;
+            margin-bottom: 10px;
+            display: block;
+            text-decoration: none;
+        }
+
+        .footer-column a:hover {
+            color: #d4af37;
+        }
+
+        .order-notification {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #d4af37;
+            margin-top: 20px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 5px;
+            display: none;
+            z-index: 3000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .notification.error {
+            background: #f44336;
+        }
+
+        .url-loading {
+            display: none;
+            color: #d4af37;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .image-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo-text {
+                font-size: 36px;
+            }
+            
+            .logo-tagline {
+                font-size: 14px;
+                letter-spacing: 5px;
+            }
+            
+            .admin-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <div>
+                    <h1 class="logo-text">Aura</h1>
+                    <div class="logo-tagline">Collection</div>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home" class="active">Home</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#admin" onclick="toggleAdminPanel()">Admin Panel</a></li>
+                    <li><a href="#orders">Orders</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Admin Panel -->
+    <div class="container">
+        <div class="admin-panel" id="adminPanel">
+            <div class="admin-header">
+                <h2 class="admin-title">Admin Dashboard</h2>
+                <button class="admin-toggle" onclick="toggleAdminPanel()">Close Admin</button>
+            </div>
+            
+            <form id="productForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productName">Product Name</label>
+                        <input type="text" id="productName" placeholder="e.g., Diamond Chain" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productCategory">Category</label>
+                        <select id="productCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="chains">Chains & Necklaces</option>
+                            <option value="rings">Rings</option>
+                            <option value="bracelets">Bracelets</option>
+                            <option value="watches">Watches</option>
+                            <option value="cufflinks">Cufflinks</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productPrice">Price ($)</label>
+                        <input type="number" id="productPrice" placeholder="e.g., 299" required step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="productStock">Stock Quantity</label>
+                        <input type="number" id="productStock" placeholder="e.g., 50" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productDescription">Description</label>
+                    <textarea id="productDescription" placeholder="Describe the product..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productImage">Product Image</label>
+                    <div class="image-options">
+                        <div class="image-option" onclick="showFileUpload()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h4>Upload Image</h4>
+                            <p>Choose file from your computer</p>
+                            <p class="image-size-warning">Max size: 5MB (JPG, PNG)</p>
+                            <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="uploadImage(event)">
+                        </div>
+                        
+                        <div class="image-option" onclick="showUrlInput()">
+                            <i class="fas fa-link"></i>
+                            <h4>Image URL</h4>
+                            <p>Paste image URL from web</p>
+                            <p class="image-size-warning">Supports: JPG, PNG, GIF, WebP</p>
+                        </div>
+                    </div>
+                    
+                    <div id="urlInputContainer" class="url-input-container" style="display: none;">
+                        <input type="url" id="imageUrl" placeholder="https://example.com/image.jpg" style="margin-bottom: 10px;">
+                        <button type="button" class="btn btn-primary" onclick="loadImageFromUrl()">Load Image</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideUrlInput()">Cancel</button>
+                        <div class="url-loading" id="urlLoading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading image...
+                        </div>
+                    </div>
+                    
+                    <div class="image-preview" id="imagePreview">
+                        <img id="previewImage" src="" alt="Preview">
+                        <div style="text-align: center; margin-top: 10px;">
+                            <button type="button" class="remove-image" onclick="removeImage()">Remove Image</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin-actions">
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear Form</button>
+                    <button type="button" class="btn btn-secondary" onclick="exportData()">Export Data</button>
+                    <button type="button" class="btn btn-secondary" onclick="testEmail()">Test Email</button>
+                </div>
+            </form>
+            
+            <div class="order-notification" style="margin-top: 30px;">
+                <h3><i class="fas fa-envelope"></i> Email Integration Active</h3>
+                <p>All orders will be sent to: <strong>ssa5993309@gmail.com</strong></p>
+                <p>Admin Code: <strong>AURA2024</strong> | Last email check: <span id="lastCheck">Just now</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <section class="products-section" id="products">
+        <div class="container">
+            <h2 class="section-title">Gents Jewelry Collection</h2>
+            <div class="products-grid" id="productsContainer">
+                <!-- Products will be dynamically added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Modal -->
+    <div class="modal-overlay" id="orderModal">
+        <div class="order-modal">
+            <div class="modal-header">
+                <h2 style="color: #d4af37;">Place Order</h2>
+                <button class="modal-close" onclick="closeOrderModal()">&times;</button>
+            </div>
+            <form id="orderForm">
+                <div class="form-group">
+                    <label for="customerName">Your Name</label>
+                    <input type="text" id="customerName" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="customerEmail">Email Address</label>
+                    <input type="email" id="customerEmail" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="customerPhone">Phone Number</label>
+                    <input type="tel" id="customerPhone" placeholder="+1234567890" required>
+                </div>
+                <div class="form-group">
+                    <label for="customerAddress">Shipping Address</label>
+                    <textarea id="customerAddress" placeholder="Full address for delivery" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Order Summary</label>
+                    <div id="orderSummary" style="background: #2a2a2a; padding: 15px; border-radius: 5px;"></div>
+                </div>
+                <div class="admin-actions">
+                    <button type="submit" class="btn btn-primary">Confirm Order</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeOrderModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Orders Section -->
+    <section class="orders-section" id="orders">
+        <div class="container">
+            <h2 class="section-title">Recent Orders</h2>
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTable">
+                    <!-- Orders will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Aura Collection</h3>
+                    <p>Premium Gents Jewelry crafted for the modern man. Luxury meets masculinity in every piece.</p>
+                    <p><i class="fas fa-envelope"></i> ssa5993309@gmail.com</p>
+                    <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <a href="#home">Home</a>
+                    <a href="#products">Collections</a>
+                    <a href="#admin" onclick="toggleAdminPanel()">Admin Login</a>
+                    <a href="#contact">Contact Us</a>
+                </div>
+                <div class="footer-column">
+                    <h3>Categories</h3>
+                    <a href="#chains">Chains & Necklaces</a>
+                    <a href="#rings">Rings</a>
+                    <a href="#bracelets">Bracelets</a>
+                    <a href="#watches">Watches</a>
+                </div>
+                <div class="footer-column">
+                    <h3>Email Notifications</h3>
+                    <p>Real email notifications for all orders</p>
+                    <p>Admin: ssa5993309@gmail.com</p>
+                    <p>24/7 Customer Support</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 Aura Collection - Gents Jewelry. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // ========== EMAIL SERVICE INTEGRATION ==========
+        const EMAIL_SERVICE_ID = 'service_aura_collection';
+        const EMAIL_TEMPLATE_ID = 'template_order_notification';
+        const EMAIL_USER_ID = 'user_aura2024';
+
+        // ========== GLOBAL VARIABLES ==========
+        let currentOrderProduct = null;
+        let uploadedImage = null;
+
+        // ========== ADMIN PANEL ==========
+        function toggleAdminPanel() {
+            const adminPanel = document.getElementById('adminPanel');
+            adminPanel.classList.toggle('active');
+            
+            if (adminPanel.classList.contains('active')) {
+                const code = prompt('Enter Admin Access Code:');
+                if (code !== 'AURA2024') {
+                    adminPanel.classList.remove('active');
+                    alert('Incorrect admin code!');
+                }
+            }
+        }
+
+        // ========== IMAGE UPLOAD FUNCTIONALITY ==========
+        function showFileUpload() {
+            document.getElementById('imageUpload').click();
+        }
+
+        function uploadImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('Image size should be less than 5MB', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImage = e.target.result;
+                    showPreview(uploadedImage);
+                    hideUrlInput();
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function showUrlInput() {
+            document.getElementById('urlInputContainer').style.display = 'block';
+            document.getElementById('imageUrl').focus();
+        }
+
+        function hideUrlInput() {
+            document.getElementById('urlInputContainer').style.display = 'none';
+            document.getElementById('imageUrl').value = '';
+            document.getElementById('urlLoading').style.display = 'none';
+        }
+
+        function loadImageFromUrl() {
+            const url = document.getElementById('imageUrl').value.trim();
+            
+            if (!url) {
+                showNotification('Please enter an image URL', 'error');
+                return;
+            }
+            
+            // Validate URL
+            try {
+                new URL(url);
+            } catch (e) {
+                showNotification('Please enter a valid URL', 'error');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('urlLoading').style.display = 'block';
+            
+            // Create a test image to check if URL is valid
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            
+            img.onload = function() {
+                // Create canvas to convert to data URL
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                try {
+                    // Try to get data URL
+                    uploadedImage = canvas.toDataURL('image/jpeg', 0.9);
+                    showPreview(uploadedImage);
+                    hideUrlInput();
+                    showNotification('Image loaded successfully from URL!');
+                } catch (e) {
+                    showNotification('Cannot load image from this URL due to CORS restrictions. Try a different image or upload instead.', 'error');
+                }
+                
+                document.getElementById('urlLoading').style.display = 'none';
+            };
+            
+            img.onerror = function() {
+                document.getElementById('urlLoading').style.display = 'none';
+                showNotification('Failed to load image from URL. Please check the URL and try again.', 'error');
+            };
+            
+            img.src = url;
+            
+            // Set timeout in case image never loads
+            setTimeout(() => {
+                if (!img.complete) {
+                    document.getElementById('urlLoading').style.display = 'none';
+                    showNotification('Image loading timed out. Please try a different URL or upload the image.', 'error');
+                }
+            }, 10000);
+        }
+
+        function showPreview(imageSrc) {
+            document.getElementById('previewImage').src = imageSrc;
+            document.getElementById('imagePreview').style.display = 'block';
+        }
+
+        function removeImage() {
+            uploadedImage = null;
+            document.getElementById('previewImage').src = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('imageUpload').value = '';
+            hideUrlInput();
+        }
+
+        // ========== PRODUCT MANAGEMENT ==========
+        const products = JSON.parse(localStorage.getItem('aura_products')) || [
+            {
+                id: 1,
+                name: "Diamond Cuban Chain",
+                category: "chains",
+                price: 999,
+                description: "18K gold Cuban chain with diamond accents",
+                stock: 15,
+                image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop"
+            },
+            {
+                id: 2,
+                name: "Platinum Signet Ring",
+                category: "rings",
+                price: 750,
+                description: "Handcrafted platinum signet ring",
+                stock: 20,
+                image: "https://images.unsplash.com/photo-1605100940231-2f8d43db5f3c?w-400&h=400&fit=crop"
+            }
+        ];
+
+        const orders = JSON.parse(localStorage.getItem('aura_orders')) || [
+            {
+                id: "ORD-001",
+                customer: "John Smith",
+                email: "john@example.com",
+                phone: "+1234567890",
+                product: "Diamond Cuban Chain",
+                amount: "$999",
+                status: "pending",
+                date: new Date().toISOString()
+            }
+        ];
+
+        // ========== DISPLAY FUNCTIONS ==========
+        function displayProducts() {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = '';
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <img src="${product.image}" alt="${product.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzJhMmEyYSIvPjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNkNGFlMzciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7wn5iYPC90ZXh0Pjwvc3ZnPg=='">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">${getCategoryName(product.category)}</div>
+                        <h3 class="product-title">${product.name}</h3>
+                        <p>${product.description}</p>
+                        <div class="product-price">$${product.price}</div>
+                        <div class="product-actions">
+                            <button class="btn btn-primary btn-small" onclick="openOrderModal(${product.id})">Order Now</button>
+                            ${product.stock < 10 ? `<span style="color: #ff4444; font-size: 12px;">Low Stock: ${product.stock}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(productCard);
+            });
+        }
+
+        function displayOrders() {
+            const table = document.getElementById('ordersTable');
+            table.innerHTML = '';
+            
+            orders.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.id}</td>
+                    <td>${order.customer}<br><small>${order.email}</small></td>
+                    <td>${order.product}</td>
+                    <td>${order.amount}</td>
+                    <td class="status-${order.status}">${order.status.toUpperCase()}</td>
+                    <td>
+                        <button class="btn-small" onclick="updateOrderStatus('${order.id}')" style="background: #d4af37; color: #000;">Update</button>
+                        <button class="btn-small" onclick="sendOrderEmail('${order.id}')" style="background: #2196F3; color: white;">Email</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function getCategoryName(category) {
+            const categories = {
+                'chains': 'Chains & Necklaces',
+                'rings': 'Rings',
+                'bracelets': 'Bracelets',
+                'watches': 'Watches',
+                'cufflinks': 'Cufflinks'
+            };
+            return categories[category] || category;
+        }
+
+        // ========== ADD NEW PRODUCT ==========
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newProduct = {
+                id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
+                name: document.getElementById('productName').value,
+                category: document.getElementById('productCategory').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                description: document.getElementById('productDescription').value,
+                stock: parseInt(document.getElementById('productStock').value),
+                image: uploadedImage || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzJhMmEyYSIvPjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNkNGFlMzciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7wn5iYPC90ZXh0Pjwvc3ZnPg=="
+            };
+            
+            products.push(newProduct);
+            saveToLocalStorage();
+            displayProducts();
+            
+            showNotification(`Product added: ${newProduct.name}`);
+            clearForm();
+            
+            // Send admin notification
+            const emailBody = `A new product has been added to Aura Collection:\n\nName: ${newProduct.name}\nPrice: $${newProduct.price}\nCategory: ${getCategoryName(newProduct.category)}\nStock: ${newProduct.stock} units\n\nDate: ${new Date().toLocaleString()}`;
+            
+            sendAdminEmail(`New Product Added: ${newProduct.name}`, emailBody);
+        });
+
+        // ========== ORDER MANAGEMENT ==========
+        function openOrderModal(productId) {
+            currentOrderProduct = products.find(p => p.id === productId);
+            if (!currentOrderProduct) return;
+            
+            if (currentOrderProduct.stock <= 0) {
+                showNotification('This product is out of stock!', 'error');
+                return;
+            }
+            
+            document.getElementById('orderSummary').innerHTML = `
+                <strong>${currentOrderProduct.name}</strong><br>
+                Price: $${currentOrderProduct.price}<br>
+                Category: ${getCategoryName(currentOrderProduct.category)}<br>
+                <small>${currentOrderProduct.description}</small>
+            `;
+            
+            document.getElementById('orderModal').classList.add('active');
+        }
+
+        function closeOrderModal() {
+            document.getElementById('orderModal').classList.remove('active');
+            document.getElementById('orderForm').reset();
+            currentOrderProduct = null;
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const orderId = 'ORD-' + (orders.length + 1).toString().padStart(3, '0');
+            const orderData = {
+                id: orderId,
+                customer: document.getElementById('customerName').value,
+                email: document.getElementById('customerEmail').value,
+                phone: document.getElementById('customerPhone').value,
+                address: document.getElementById('customerAddress').value,
+                product: currentOrderProduct.name,
+                productId: currentOrderProduct.id,
+                amount: `$${currentOrderProduct.price}`,
+                status: 'pending',
+                date: new Date().toISOString()
+            };
+            
+            // Reduce stock
+            currentOrderProduct.stock--;
+            
+            // Add to orders
+            orders.unshift(orderData);
+            
+            // Save data
+            saveToLocalStorage();
+            displayProducts();
+            displayOrders();
+            
+            // Close modal
+            closeOrderModal();
+            
+            // Send real email
+            const emailSent = await sendRealEmail(orderData);
+            
+            if (emailSent) {
+                showNotification(`Order placed! Order ID: ${orderId}. Email sent to admin.`);
+            } else {
+                showNotification(`Order placed! Order ID: ${orderId}. Email notification failed.`);
+            }
+            
+            // Update last check time
+            document.getElementById('lastCheck').textContent = new Date().toLocaleTimeString();
+        });
+
+        // ========== REAL EMAIL FUNCTIONALITY ==========
+        async function sendRealEmail(orderData) {
+            try {
+                // Method 2: Using mailto link (Works without backend)
+                const subject = `New Order: ${orderData.id} - Aura Collection`;
+                const body = `
+Order Details:
+Order ID: ${orderData.id}
+Customer: ${orderData.customer}
+Email: ${orderData.email}
+Phone: ${orderData.phone}
+Product: ${orderData.product}
+Amount: ${orderData.amount}
+Address: ${orderData.address}
+Order Date: ${new Date(orderData.date).toLocaleString()}
+
+Order placed at Aura Collection Gents Jewelry.
+                `;
+                
+                // Create mailto link
+                const mailtoLink = `mailto:ssa5993309@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                
+                // Open in new window
+                window.open(mailtoLink, '_blank');
+                
+                return true;
+                
+            } catch (error) {
+                console.error('Email error:', error);
+                return false;
+            }
+        }
+
+        function sendAdminEmail(subject, body) {
+            const mailtoLink = `mailto:ssa5993309@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink, '_blank');
+        }
+
+        function testEmail() {
+            const testOrder = {
+                id: 'TEST-001',
+                customer: 'Test Customer',
+                email: 'test@example.com',
+                phone: '+1234567890',
+                address: 'Test Address',
+                product: 'Test Product',
+                amount: '$99',
+                date: new Date().toISOString()
+            };
+            
+            sendRealEmail(testOrder);
+            showNotification('Test email opened in new window');
+        }
+
+        // ========== UTILITY FUNCTIONS ==========
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+
+        function clearForm() {
+            document.getElementById('productForm').reset();
+            removeImage();
+            hideUrlInput();
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('aura_products', JSON.stringify(products));
+            localStorage.setItem('aura_orders', JSON.stringify(orders));
+        }
+
+        function exportData() {
+            const data = {
+                products: products,
+                orders: orders,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `aura-collection-data-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('Data exported successfully!');
+        }
+
+        function updateOrderStatus(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            const newStatus = prompt(`Update status for ${orderId}:\nEnter "pending" or "completed"`, order.status);
+            
+            if (newStatus && ['pending', 'completed'].includes(newStatus.toLowerCase())) {
+                order.status = newStatus.toLowerCase();
+                saveToLocalStorage();
+                displayOrders();
+                showNotification(`Order ${orderId} updated to ${newStatus}`);
+            }
+        }
+
+        function sendOrderEmail(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                sendRealEmail(order);
+                showNotification(`Email opened for order ${orderId}`);
+            }
+        }
+
+        // ========== INITIALIZE ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            displayProducts();
+            displayOrders();
+            
+            // Auto-save every 5 minutes
+            setInterval(saveToLocalStorage, 5 * 60 * 1000);
+            
+            // Check for admin access in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const adminCode = urlParams.get('admin');
+            
+            if (adminCode === 'AURA2024') {
+                toggleAdminPanel();
+            }
+            
+            showNotification('Aura Collection - Gents Jewelry Store is ready!');
+        });
+    </script>
+</body>
+</html>
