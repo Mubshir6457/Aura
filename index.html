@@ -693,6 +693,34 @@
             letter-spacing: 1px;
         }
 
+        /* Product Price Styles */
+        .price-container {
+            margin: 15px 0;
+        }
+
+        .original-price {
+            font-size: 16px;
+            color: #999;
+            text-decoration: line-through;
+            margin-right: 10px;
+        }
+
+        .discount-price {
+            font-size: 24px;
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        .discount-badge {
+            background: #ff4444;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
         .product-price {
             font-size: 24px;
             color: #d4af37;
@@ -1943,7 +1971,9 @@
                                 <th>Product Name</th>
                                 <th>Category</th>
                                 <th>Cost Price (Rs)</th>
-                                <th>Selling Price (Rs)</th>
+                                <th>Actual Price (Rs)</th>
+                                <th>Discount %</th>
+                                <th>Discount Price (Rs)</th>
                                 <th>Initial Stock</th>
                                 <th>Remaining Stock</th>
                                 <th>Sold Stock</th>
@@ -1994,7 +2024,7 @@
                 </div>
             </div>
             
-            <!-- Add Product Form (Updated with Cost Price) -->
+            <!-- Add Product Form (Updated with Discount) -->
             <form id="productForm" style="margin-top: 30px;">
                 <div class="form-row">
                     <div class="form-group">
@@ -2031,8 +2061,19 @@
                         <input type="number" id="costPrice" placeholder="e.g., 1500" required min="1" step="0.01">
                     </div>
                     <div class="form-group">
-                        <label for="productPrice">Selling Price (Rs)</label>
-                        <input type="number" id="productPrice" placeholder="e.g., 2999" required min="1" step="0.01">
+                        <label for="actualPrice">Actual Selling Price (Rs)</label>
+                        <input type="number" id="actualPrice" placeholder="e.g., 2999" required min="1" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="discountPercentage">Discount Percentage (%)</label>
+                        <input type="number" id="discountPercentage" placeholder="e.g., 20" min="0" max="100" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="discountPrice">Discount Price (Rs) - Auto-calculated</label>
+                        <input type="number" id="discountPrice" placeholder="Will calculate automatically" readonly>
                     </div>
                 </div>
                 
@@ -2106,7 +2147,9 @@
                                 <th>Order ID</th>
                                 <th>Customer</th>
                                 <th>Product</th>
-                                <th>Amount</th>
+                                <th>Actual Price</th>
+                                <th>Discount Price</th>
+                                <th>Paid Amount</th>
                                 <th>Date</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -2166,7 +2209,9 @@
                             <th>Product Name</th>
                             <th>Category</th>
                             <th>Cost (Rs)</th>
-                            <th>Price (Rs)</th>
+                            <th>Actual Price (Rs)</th>
+                            <th>Discount %</th>
+                            <th>Discount Price (Rs)</th>
                             <th>Stock</th>
                             <th>Sold</th>
                             <th>Profit (Rs)</th>
@@ -2280,8 +2325,19 @@
                         <input type="number" id="quickCostPrice" placeholder="1500" required min="1" step="0.01">
                     </div>
                     <div class="form-group">
-                        <label for="quickSellingPrice">Selling Price (Rs)*</label>
-                        <input type="number" id="quickSellingPrice" placeholder="2999" required min="1" step="0.01">
+                        <label for="quickActualPrice">Actual Price (Rs)*</label>
+                        <input type="number" id="quickActualPrice" placeholder="2999" required min="1" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="quickDiscountPercentage">Discount Percentage (%)</label>
+                        <input type="number" id="quickDiscountPercentage" placeholder="20" min="0" max="100" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="quickDiscountPrice">Discount Price (Rs)</label>
+                        <input type="number" id="quickDiscountPrice" placeholder="Auto-calculated" readonly>
                     </div>
                 </div>
                 
@@ -2343,8 +2399,19 @@
                         <input type="number" id="editCostPrice" required min="1" step="0.01">
                     </div>
                     <div class="form-group">
-                        <label for="editSellingPrice">Selling Price (Rs)*</label>
-                        <input type="number" id="editSellingPrice" required min="1" step="0.01">
+                        <label for="editActualPrice">Actual Price (Rs)*</label>
+                        <input type="number" id="editActualPrice" required min="1" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editDiscountPercentage">Discount Percentage (%)</label>
+                        <input type="number" id="editDiscountPercentage" min="0" max="100" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="editDiscountPrice">Discount Price (Rs)</label>
+                        <input type="number" id="editDiscountPrice" readonly>
                     </div>
                 </div>
                 
@@ -2396,7 +2463,7 @@
             logoImage: null
         };
 
-        // Products data (with stock management fields)
+        // Products data (with discount and stock management fields)
         let products = JSON.parse(localStorage.getItem('aura_products')) || [];
 
         // Orders data
@@ -2404,6 +2471,45 @@
 
         // Firebase database reference
         let db = firebase.database();
+
+        // ========== DISCOUNT CALCULATION FUNCTIONS ==========
+        function calculateDiscountPrice(actualPrice, discountPercentage) {
+            if (!discountPercentage || discountPercentage <= 0) {
+                return actualPrice;
+            }
+            const discount = (actualPrice * discountPercentage) / 100;
+            return actualPrice - discount;
+        }
+
+        function updateDiscountPrice() {
+            const actualPrice = parseFloat(document.getElementById('actualPrice').value) || 0;
+            const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
+            
+            if (actualPrice > 0) {
+                const discountPrice = calculateDiscountPrice(actualPrice, discountPercentage);
+                document.getElementById('discountPrice').value = discountPrice.toFixed(2);
+            }
+        }
+
+        function updateQuickDiscountPrice() {
+            const actualPrice = parseFloat(document.getElementById('quickActualPrice').value) || 0;
+            const discountPercentage = parseFloat(document.getElementById('quickDiscountPercentage').value) || 0;
+            
+            if (actualPrice > 0) {
+                const discountPrice = calculateDiscountPrice(actualPrice, discountPercentage);
+                document.getElementById('quickDiscountPrice').value = discountPrice.toFixed(2);
+            }
+        }
+
+        function updateEditDiscountPrice() {
+            const actualPrice = parseFloat(document.getElementById('editActualPrice').value) || 0;
+            const discountPercentage = parseFloat(document.getElementById('editDiscountPercentage').value) || 0;
+            
+            if (actualPrice > 0) {
+                const discountPrice = calculateDiscountPrice(actualPrice, discountPercentage);
+                document.getElementById('editDiscountPrice').value = discountPrice.toFixed(2);
+            }
+        }
 
         // ========== FIREBASE FUNCTIONS ==========
         function syncWithFirebase() {
@@ -2934,9 +3040,9 @@
 
         function calculateProfit(product) {
             const cost = product.costPrice || 0;
-            const price = product.price || 0;
+            const actualPrice = product.actualPrice || 0;
             const sold = product.soldStock || 0;
-            return ((price - cost) * sold);
+            return ((actualPrice - cost) * sold);
         }
 
         function calculateTotalCost(product) {
@@ -2947,8 +3053,8 @@
 
         function calculateTotalSales(product) {
             const soldStock = product.soldStock || 0;
-            const sellingPrice = product.price || 0;
-            return soldStock * sellingPrice;
+            const actualPrice = product.actualPrice || 0;
+            return soldStock * actualPrice;
         }
 
         function updateStockCalculations() {
@@ -3017,7 +3123,7 @@
             if (!filteredProducts || filteredProducts.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="13" style="text-align: center; padding: 30px; color: #999;">
+                        <td colspan="15" style="text-align: center; padding: 30px; color: #999;">
                             <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 15px;"></i>
                             <p>No products found.</p>
                         </td>
@@ -3038,7 +3144,9 @@
                 const currentStock = product.stock || 0;
                 const soldStock = product.soldStock || 0;
                 const costPrice = product.costPrice || 0;
-                const sellingPrice = product.price || 0;
+                const actualPrice = product.actualPrice || 0;
+                const discountPercentage = product.discountPercentage || 0;
+                const discountPrice = product.discountPrice || actualPrice;
                 const totalCost = calculateTotalCost(product);
                 const totalSales = calculateTotalSales(product);
                 const profit = calculateProfit(product);
@@ -3055,7 +3163,9 @@
                     <td>${product.name}</td>
                     <td>${getCategoryName(product.category)}</td>
                     <td>Rs ${costPrice.toLocaleString()}</td>
-                    <td>Rs ${sellingPrice.toLocaleString()}</td>
+                    <td>Rs ${actualPrice.toLocaleString()}</td>
+                    <td>${discountPercentage > 0 ? discountPercentage + '%' : 'No discount'}</td>
+                    <td>Rs ${discountPrice.toLocaleString()}</td>
                     <td>${initialStock}</td>
                     <td>${currentStock}</td>
                     <td>${soldStock}</td>
@@ -3128,7 +3238,9 @@
                 'Product Name',
                 'Category',
                 'Cost Price (Rs)',
-                'Selling Price (Rs)',
+                'Actual Price (Rs)',
+                'Discount %',
+                'Discount Price (Rs)',
                 'Initial Stock',
                 'Remaining Stock',
                 'Sold Stock',
@@ -3144,7 +3256,9 @@
                 const currentStock = product.stock || 0;
                 const soldStock = product.soldStock || 0;
                 const costPrice = product.costPrice || 0;
-                const sellingPrice = product.price || 0;
+                const actualPrice = product.actualPrice || 0;
+                const discountPercentage = product.discountPercentage || 0;
+                const discountPrice = product.discountPrice || actualPrice;
                 const totalCost = calculateTotalCost(product);
                 const totalSales = calculateTotalSales(product);
                 const profit = calculateProfit(product);
@@ -3156,7 +3270,9 @@
                     product.name,
                     getCategoryName(product.category),
                     costPrice,
-                    sellingPrice,
+                    actualPrice,
+                    discountPercentage > 0 ? discountPercentage + '%' : 'No discount',
+                    discountPrice,
                     initialStock,
                     currentStock,
                     soldStock,
@@ -3180,11 +3296,11 @@
             });
             
             data.push([]); // Empty row
-            data.push(['SUMMARY', '', '', '', '', '', '', '', '', '', '', '']);
-            data.push(['Total Products', totalProducts, '', '', '', '', '', '', '', '', '', '']);
-            data.push(['Total Investment', `Rs ${totalInvestment.toLocaleString()}`, '', '', '', '', '', '', '', '', '', '']);
-            data.push(['Total Sales', `Rs ${totalSalesValue.toLocaleString()}`, '', '', '', '', '', '', '', '', '', '']);
-            data.push(['Net Profit', `Rs ${totalProfitValue.toLocaleString()}`, '', '', '', '', '', '', '', '', '', '']);
+            data.push(['SUMMARY', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+            data.push(['Total Products', totalProducts, '', '', '', '', '', '', '', '', '', '', '', '']);
+            data.push(['Total Investment', `Rs ${totalInvestment.toLocaleString()}`, '', '', '', '', '', '', '', '', '', '', '', '']);
+            data.push(['Total Sales', `Rs ${totalSalesValue.toLocaleString()}`, '', '', '', '', '', '', '', '', '', '', '', '']);
+            data.push(['Net Profit', `Rs ${totalProfitValue.toLocaleString()}`, '', '', '', '', '', '', '', '', '', '', '', '']);
             
             // Convert to CSV
             const csvContent = data.map(row => 
@@ -3226,7 +3342,9 @@
             document.getElementById('editCategory').value = product.category || '';
             document.getElementById('editStock').value = product.stock || 0;
             document.getElementById('editCostPrice').value = product.costPrice || 0;
-            document.getElementById('editSellingPrice').value = product.price || 0;
+            document.getElementById('editActualPrice').value = product.actualPrice || 0;
+            document.getElementById('editDiscountPercentage').value = product.discountPercentage || 0;
+            document.getElementById('editDiscountPrice').value = product.discountPrice || product.actualPrice || 0;
             document.getElementById('editSoldStock').value = product.soldStock || 0;
             document.getElementById('editInitialStock').value = product.initialStock || product.stock || 0;
             document.getElementById('editDescription').value = product.description || '';
@@ -3329,6 +3447,28 @@
         function createProductCard(product) {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
+            
+            const actualPrice = product.actualPrice || 0;
+            const discountPercentage = product.discountPercentage || 0;
+            const discountPrice = product.discountPrice || actualPrice;
+            
+            let priceHtml = '';
+            if (discountPercentage > 0) {
+                priceHtml = `
+                    <div class="price-container">
+                        <span class="original-price">Rs ${actualPrice.toLocaleString()}</span>
+                        <span class="discount-price">Rs ${discountPrice.toLocaleString()}</span>
+                        <span class="discount-badge">${discountPercentage}% OFF</span>
+                    </div>
+                `;
+            } else {
+                priceHtml = `
+                    <div class="price-container">
+                        <span class="discount-price">Rs ${actualPrice.toLocaleString()}</span>
+                    </div>
+                `;
+            }
+            
             productCard.innerHTML = `
                 <div class="product-image">
                     <img src="${product.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzJhMmEyYSIvPjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNkNGFlMzciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7wn5iYPC90ZXh0Pjwvc3ZnPg=='}" alt="${product.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzJhMmEyYSIvPjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNkNGFlMzciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7wn5iYPC90ZXh0Pjwvc3ZnPg=='">
@@ -3337,7 +3477,7 @@
                     <div class="product-category">${getCategoryName(product.category)}</div>
                     <h3 class="product-title">${product.name}</h3>
                     <p>${product.description}</p>
-                    <div class="product-price">Rs ${product.price || 0}</div>
+                    ${priceHtml}
                     <div class="product-actions">
                         <button class="btn btn-primary btn-small" onclick="openOrderModal(${product.id})">Order Now</button>
                         ${product.stock < 10 ? `<span style="color: #ff4444; font-size: 12px;">Low Stock: ${product.stock}</span>` : ''}
@@ -3368,7 +3508,7 @@
             if (!products || products.length === 0) {
                 table.innerHTML = `
                     <tr>
-                        <td colspan="9" style="text-align: center; padding: 30px; color: #999;">
+                        <td colspan="11" style="text-align: center; padding: 30px; color: #999;">
                             <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 15px;"></i>
                             <p>No products found. Add your first product!</p>
                         </td>
@@ -3381,6 +3521,10 @@
                 if (!product || !product.name) return;
                 
                 const profit = calculateProfit(product);
+                const actualPrice = product.actualPrice || 0;
+                const discountPercentage = product.discountPercentage || 0;
+                const discountPrice = product.discountPrice || actualPrice;
+                
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><strong>${product.code || 'N/A'}</strong></td>
@@ -3390,7 +3534,9 @@
                     </td>
                     <td>${getCategoryName(product.category)}</td>
                     <td>Rs ${product.costPrice || 0}</td>
-                    <td>Rs ${product.price || 0}</td>
+                    <td>Rs ${actualPrice.toLocaleString()}</td>
+                    <td>${discountPercentage > 0 ? discountPercentage + '%' : 'No discount'}</td>
+                    <td>Rs ${discountPrice.toLocaleString()}</td>
                     <td>
                         <span style="color: ${(product.stock || 0) < 10 ? '#ff4444' : (product.stock || 0) < 20 ? '#ff9800' : '#4CAF50'}">
                             ${product.stock || 0}
@@ -3427,7 +3573,7 @@
             if (orders.length === 0) {
                 table.innerHTML = `
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 30px; color: #999;">
+                        <td colspan="9" style="text-align: center; padding: 30px; color: #999;">
                             <i class="fas fa-shopping-cart" style="font-size: 48px; margin-bottom: 15px;"></i>
                             <p>No orders yet.</p>
                         </td>
@@ -3436,7 +3582,7 @@
                 return;
             }
             
-            orders.slice(0, 20).forEach(order => { // Show last 20 orders
+            orders.slice(0, 20).forEach(order => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><strong>${order.id}</strong></td>
@@ -3445,7 +3591,9 @@
                         <small>${order.email}</small>
                     </td>
                     <td>${order.product} (${order.productCode})</td>
-                    <td>${order.amount}</td>
+                    <td>${order.actualAmount}</td>
+                    <td>${order.discountAmount}</td>
+                    <td>${order.paidAmount}</td>
                     <td>${new Date(order.date).toLocaleDateString()}</td>
                     <td>
                         <span class="status-${order.status}">
@@ -3522,8 +3670,10 @@
             const productCode = document.getElementById('productCode').value.trim().toUpperCase();
             const productName = document.getElementById('productName').value.trim();
             const productCategory = document.getElementById('productCategory').value;
-            const productPrice = parseFloat(document.getElementById('productPrice').value);
+            const actualPrice = parseFloat(document.getElementById('actualPrice').value);
             const costPrice = parseFloat(document.getElementById('costPrice').value);
+            const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
+            const discountPrice = parseFloat(document.getElementById('discountPrice').value) || actualPrice;
             const productDescription = document.getElementById('productDescription').value.trim();
             const productStock = parseInt(document.getElementById('productStock').value);
             
@@ -3532,8 +3682,8 @@
                 return;
             }
             
-            if (costPrice >= productPrice) {
-                showNotification('Selling price must be greater than cost price', 'error');
+            if (costPrice >= actualPrice) {
+                showNotification('Actual price must be greater than cost price', 'error');
                 return;
             }
             
@@ -3545,8 +3695,10 @@
                         code: productCode,
                         name: productName,
                         category: productCategory,
-                        price: productPrice,
+                        actualPrice: actualPrice,
                         costPrice: costPrice,
+                        discountPercentage: discountPercentage,
+                        discountPrice: discountPrice,
                         description: productDescription,
                         stock: productStock,
                         image: uploadedImage || products[index].image
@@ -3562,8 +3714,10 @@
                     code: productCode,
                     name: productName,
                     category: productCategory,
-                    price: productPrice,
+                    actualPrice: actualPrice,
                     costPrice: costPrice,
+                    discountPercentage: discountPercentage,
+                    discountPrice: discountPrice,
                     description: productDescription,
                     stock: productStock,
                     initialStock: productStock,
@@ -3605,8 +3759,10 @@
             const productCode = document.getElementById('quickProductCode').value.trim().toUpperCase();
             const productName = document.getElementById('quickProductName').value.trim();
             const productCategory = document.getElementById('quickCategory').value;
-            const productPrice = parseFloat(document.getElementById('quickSellingPrice').value);
+            const actualPrice = parseFloat(document.getElementById('quickActualPrice').value);
             const costPrice = parseFloat(document.getElementById('quickCostPrice').value);
+            const discountPercentage = parseFloat(document.getElementById('quickDiscountPercentage').value) || 0;
+            const discountPrice = parseFloat(document.getElementById('quickDiscountPrice').value) || actualPrice;
             const productDescription = document.getElementById('quickDescription').value.trim();
             const productStock = parseInt(document.getElementById('quickStock').value);
             
@@ -3615,8 +3771,8 @@
                 return;
             }
             
-            if (costPrice >= productPrice) {
-                showNotification('Selling price must be greater than cost price', 'error');
+            if (costPrice >= actualPrice) {
+                showNotification('Actual price must be greater than cost price', 'error');
                 return;
             }
             
@@ -3625,8 +3781,10 @@
                 code: productCode,
                 name: productName,
                 category: productCategory,
-                price: productPrice,
+                actualPrice: actualPrice,
                 costPrice: costPrice,
+                discountPercentage: discountPercentage,
+                discountPrice: discountPrice,
                 description: productDescription,
                 stock: productStock,
                 initialStock: productStock,
@@ -3667,8 +3825,10 @@
             const productCode = document.getElementById('editProductCode').value.trim().toUpperCase();
             const productName = document.getElementById('editProductName').value.trim();
             const productCategory = document.getElementById('editCategory').value;
-            const productPrice = parseFloat(document.getElementById('editSellingPrice').value);
+            const actualPrice = parseFloat(document.getElementById('editActualPrice').value);
             const costPrice = parseFloat(document.getElementById('editCostPrice').value);
+            const discountPercentage = parseFloat(document.getElementById('editDiscountPercentage').value) || 0;
+            const discountPrice = parseFloat(document.getElementById('editDiscountPrice').value) || actualPrice;
             const productDescription = document.getElementById('editDescription').value.trim();
             const productStock = parseInt(document.getElementById('editStock').value);
             
@@ -3677,8 +3837,8 @@
                 return;
             }
             
-            if (costPrice >= productPrice) {
-                showNotification('Selling price must be greater than cost price', 'error');
+            if (costPrice >= actualPrice) {
+                showNotification('Actual price must be greater than cost price', 'error');
                 return;
             }
             
@@ -3692,8 +3852,10 @@
                     code: productCode,
                     name: productName,
                     category: productCategory,
-                    price: productPrice,
+                    actualPrice: actualPrice,
                     costPrice: costPrice,
+                    discountPercentage: discountPercentage,
+                    discountPrice: discountPrice,
                     description: productDescription,
                     stock: productStock,
                     initialStock: initialStock
@@ -3735,8 +3897,10 @@
             document.getElementById('productCode').value = product.code || '';
             document.getElementById('productName').value = product.name || '';
             document.getElementById('productCategory').value = product.category || '';
-            document.getElementById('productPrice').value = product.price || 0;
+            document.getElementById('actualPrice').value = product.actualPrice || 0;
             document.getElementById('costPrice').value = product.costPrice || 0;
+            document.getElementById('discountPercentage').value = product.discountPercentage || 0;
+            document.getElementById('discountPrice').value = product.discountPrice || product.actualPrice || 0;
             document.getElementById('productDescription').value = product.description || '';
             document.getElementById('productStock').value = product.stock || 0;
             
@@ -3862,11 +4026,29 @@
                 return;
             }
             
+            const actualPrice = currentOrderProduct.actualPrice || 0;
+            const discountPercentage = currentOrderProduct.discountPercentage || 0;
+            const discountPrice = currentOrderProduct.discountPrice || actualPrice;
+            
+            let priceHtml = '';
+            if (discountPercentage > 0) {
+                priceHtml = `
+                    <strong>Price Details:</strong><br>
+                    Original Price: <s>Rs ${actualPrice}</s><br>
+                    Discount: ${discountPercentage}% OFF<br>
+                    <strong>Discounted Price: Rs ${discountPrice}</strong>
+                `;
+            } else {
+                priceHtml = `
+                    <strong>Price: Rs ${actualPrice}</strong>
+                `;
+            }
+            
             document.getElementById('orderSummary').innerHTML = `
                 <strong>${currentOrderProduct.name}</strong><br>
                 Code: ${currentOrderProduct.code || 'N/A'}<br>
-                Price: Rs ${currentOrderProduct.price}<br>
                 Category: ${getCategoryName(currentOrderProduct.category)}<br>
+                ${priceHtml}<br>
                 <small>${currentOrderProduct.description}</small>
             `;
             
@@ -3883,6 +4065,10 @@
             e.preventDefault();
             
             const orderId = 'ORD-' + (orders.length + 1).toString().padStart(3, '0');
+            const actualPrice = currentOrderProduct.actualPrice || 0;
+            const discountPercentage = currentOrderProduct.discountPercentage || 0;
+            const discountPrice = currentOrderProduct.discountPrice || actualPrice;
+            
             const orderData = {
                 id: orderId,
                 customer: document.getElementById('customerName').value,
@@ -3892,7 +4078,9 @@
                 product: currentOrderProduct.name,
                 productCode: currentOrderProduct.code,
                 productId: currentOrderProduct.id,
-                amount: `Rs ${currentOrderProduct.price}`,
+                actualAmount: `Rs ${actualPrice}`,
+                discountAmount: discountPercentage > 0 ? `${discountPercentage}% OFF` : 'No discount',
+                paidAmount: `Rs ${discountPrice}`,
                 status: 'pending',
                 date: new Date().toISOString()
             };
@@ -3954,7 +4142,9 @@ Customer: ${orderData.customer}
 Email: ${orderData.email}
 Phone: ${orderData.phone}
 Product: ${orderData.product} (${orderData.productCode})
-Amount: ${orderData.amount}
+Actual Price: ${orderData.actualAmount}
+Discount: ${orderData.discountAmount}
+Paid Amount: ${orderData.paidAmount}
 Address: ${orderData.address}
 Order Date: ${new Date(orderData.date).toLocaleString()}
 
@@ -4041,6 +4231,16 @@ Order placed at Aura Collection Gents Jewelry.
             displayAdminProductsList();
             displayStockTable();
             updateStockCalculations();
+            
+            // Set up discount calculation listeners
+            document.getElementById('actualPrice').addEventListener('input', updateDiscountPrice);
+            document.getElementById('discountPercentage').addEventListener('input', updateDiscountPrice);
+            
+            document.getElementById('quickActualPrice').addEventListener('input', updateQuickDiscountPrice);
+            document.getElementById('quickDiscountPercentage').addEventListener('input', updateQuickDiscountPrice);
+            
+            document.getElementById('editActualPrice').addEventListener('input', updateEditDiscountPrice);
+            document.getElementById('editDiscountPercentage').addEventListener('input', updateEditDiscountPrice);
             
             // Auto-save every 5 minutes
             setInterval(saveToLocalStorage, 5 * 60 * 1000);
